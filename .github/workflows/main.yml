@@ -7,8 +7,8 @@ jobs:
       - name: Cài đặt RDP
         shell: cmd
         run: |
-          net user runneradmin vps12345 /add
-          net localgroup administrators runneradmin /add
+          net user vpsadmin Vps@123456 /add
+          net localgroup administrators vpsadmin /add
           reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
           netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
       - name: Khởi động Bore
