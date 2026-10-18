@@ -4,16 +4,14 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Cài đặt RDP và Cấp quyền
+      - name: Setup RDP
         shell: cmd
         run: |
-          net user vpsadmin Vps@123456 /add
-          net localgroup administrators vpsadmin /add
-          net localgroup "Remote Desktop Users" vpsadmin /add
+          net user runneradmin Vps@123456
           reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
           reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d 0 /f
           netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
-      - name: Khởi động Bore
+      - name: Start Bore
         shell: powershell
         run: |
           Invoke-WebRequest https://github.com/ekzhang/bore/releases/download/v0.4.1/bore-v0.4.1-x86_64-pc-windows-msvc.zip -OutFile bore.zip
