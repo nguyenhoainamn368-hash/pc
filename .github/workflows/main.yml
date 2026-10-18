@@ -4,12 +4,14 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Cài đặt RDP
+      - name: Cài đặt RDP và Cấp quyền
         shell: cmd
         run: |
           net user vpsadmin Vps@123456 /add
           net localgroup administrators vpsadmin /add
+          net localgroup "Remote Desktop Users" vpsadmin /add
           reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
+          reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d 0 /f
           netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
       - name: Khởi động Bore
         shell: powershell
