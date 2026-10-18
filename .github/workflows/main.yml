@@ -1,0 +1,18 @@
+name: Windows-VPS
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Cài đặt mật khẩu & RDP
+        run: |
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+          net user runneradmin vps12345
+      - name: Khởi động Ngrok
+        run: |
+          Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
+          Expand-Archive ngrok.zip
+          .\ngrok\ngrok.exe config add-authtoken 3KrPWK2HCPTIdAhd8ONUHOOIZpQ_6L5Sco3uDzViWn2oxhnZS
+          .\ngrok\ngrok.exe tcp 3389
