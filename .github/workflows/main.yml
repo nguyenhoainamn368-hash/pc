@@ -4,15 +4,18 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Cài đặt mật khẩu & RDP
+      - name: Enable RDP & Set Password
+        shell: cmd
         run: |
-          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
-          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
-          net user runneradmin vps12345
-      - name: Khởi động Ngrok
+          net user runneradmin vps12345 /add
+          net localgroup administrators runneradmin /add
+          reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
+          netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
+
+      - name: Setup and Run Ngrok
+        shell: cmd
         run: |
-          Invoke-WebRequest https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
-          Expand-Archive ngrok.zip
-          .\ngrok\ngrok.exe config add-authtoken 3KrPWK2HCPTIdAhd8ONUHOOIZpQ_6L5Sco3uDzViWn2oxhnZS
-          .\ngrok\ngrok.exe tcp 3389
+          curl -s -L -o ngrok.zip https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip
+          tar -xf ngrok.zip
+          ngrok.exe config add-authtoken 3KrPWK2HCPTIdAhd8ONUHOOIZpQ_6L5Sco3uDzViWn2oxhnZS
+          ngrok.exe tcp 3389
