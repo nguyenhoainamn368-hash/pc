@@ -4,13 +4,17 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Setup Windows
+      - name: Cài đặt RDP
         shell: cmd
         run: |
           net user runneradmin vps12345 /add
           net localgroup administrators runneradmin /add
           reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
           netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
-      - name: Start Pinggy
-        shell: cmd
-        run: ssh -p 443 -o StrictHostKeyChecking=no -R0:127.0.0.1:3389 tcp@a.pinggy.io
+      - name: Khởi động Bore
+        shell: powershell
+        run: |
+          Invoke-WebRequest https://github.com/ekzhang/bore/releases/download/v0.4.1/bore-v0.4.1-x86_64-pc-windows-msvc.zip -OutFile bore.zip
+          Expand-Archive bore.zip -DestinationPath bore
+          cd bore
+          .\bore.exe local 3389 --to bore.pub
