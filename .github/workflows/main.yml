@@ -1,4 +1,4 @@
-name: Windows-VPS
+name: Roblox-Dev-VPS
 on: workflow_dispatch
 jobs:
   build:
@@ -11,6 +11,21 @@ jobs:
           reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 0 /f
           reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d 0 /f
           netsh advfirewall firewall set rule group="remote desktop" new enable=Yes
+          
+      - name: Prepare Roblox Studio and Gemini
+        shell: powershell
+        run: |
+          # Tải file cài đặt Roblox Studio ra màn hình
+          Invoke-WebRequest -Uri "https://setup.rbxcdn.com/RobloxStudioLauncherBeta.exe" -OutFile "C:\Users\Public\Desktop\Cai_Dat_Roblox_Studio.exe"
+          
+          # Tạo lối tắt Gemini ra màn hình Desktop
+          $WshShell = New-Object -comObject WScript.Shell
+          $Shortcut = $WshShell.CreateShortcut("C:\Users\Public\Desktop\Gemini.lnk")
+          $Shortcut.TargetPath = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+          $Shortcut.Arguments = "https://gemini.google.com/"
+          $Shortcut.IconLocation = "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe, 0"
+          $Shortcut.Save()
+
       - name: Start Bore
         shell: powershell
         run: |
